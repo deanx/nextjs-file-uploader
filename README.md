@@ -26,6 +26,7 @@ npm run start:dev
 ### Decisions driven for the 100.000 case
 - Make possible to decouple file location. Use an alternative to isolate it. In this case, a local database.
 - Deal with all files as streams
+- Have a limitation mechanism (current 5) do don't allow too many uploads at sime time (guarantee service running). For production, this number should be found due to hardware capacity
 
 ### Possible enhancements if we have a high load, or really big files
 - Send the response for upload after having the tmp name only and process the hash and upload to the cloud in another process. Maybe use a language like Golang for this purpose.
