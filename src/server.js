@@ -4,6 +4,7 @@ import next from 'next';
 import busboy from 'connect-busboy';
 
 import routes from './routes';
+
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
@@ -17,6 +18,12 @@ app.prepare().then(() => {
   server.use('/api', routes);
 
   server.get('*', (req, res) => handle(req, res));
+
+  server.use((err, req, res, next) => {
+    console.error("erro!", err.status);
+    res.status(500).send();
+    next();
+  });
 
   server.listen(serverPort, (err) => {
     if (err) throw err;
