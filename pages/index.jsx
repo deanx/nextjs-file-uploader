@@ -2,7 +2,9 @@ import React, { Component, Fragment } from 'react';
 import Dropzone from 'react-dropzone';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { blue500 } from 'material-ui/styles/colors';
-import RaisedButton from 'material-ui/RaisedButton';
+import Button from '@material-ui/core/Button';
+import FileUpload from '@material-ui/icons/FileUpload';
+import Save from '@material-ui/icons/Save';
 import request from 'superagent';
 
 export default class UploadForm extends Component {
@@ -20,7 +22,7 @@ export default class UploadForm extends Component {
     this.setState({ filesToBeSent });
   }
 
-  handleClick(event) {
+  handleClick() {
     if(this.state.filesToBeSent.length > 0) {
       const file = this.state.filesToBeSent[0];
       const uploadRequest = request.post(this.url);
@@ -29,7 +31,8 @@ export default class UploadForm extends Component {
         if(err) {
           console.log('error uploading file', file);
         } else {
-          alert('File upload completed!');
+          alert(`File upload completed!`);
+          this.setState({'fileLink': `http://localhost:3000/api/files/${res.body.result}`});
         }
       });
     } else {
@@ -66,11 +69,24 @@ export default class UploadForm extends Component {
             }
           </div>
         </Dropzone>
+
         <MuiThemeProvider>
-          <RaisedButton label="Upload file" style={styleButton} primary onClick={event => this.handleClick(event)} />
+          <div>
+          <Button variant="contained" color="default" style={styleButton} primary onClick={event => this.handleClick(event)}>
+            Upload
+            <FileUpload />
+          </Button>
+          {
+            this.state.fileLink ? <FileLink link={this.state.fileLink} />  : ''
+          }
+          </div>
         </MuiThemeProvider>
         </div>
       </Fragment>
     );
   }
+}
+
+const FileLink = ({ link }) => {
+  return <Button variant="contained" onClick={() => window.open(link, '_blank')}><Save />Save</Button>
 }

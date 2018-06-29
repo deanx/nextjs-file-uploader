@@ -1,14 +1,16 @@
-import loki from 'lokijs';
+import low from 'lowdb';
+const Filesync = require('lowdb/adapters/FileSync')
 
-const dbfile = './loki.json';
-const db = new loki(dbfile);
-const fileCollection = db.addCollection('files');
+const adapter = new Filesync('db.json')
+const db = low(adapter)
+db.defaults({ files: [] }).write();
 
 export const insertFile = (hash, location) => {
-  return fileCollection.insert({ hash, location });
-};
+  db.get('files').push({hash, location}).write();
+}
+
 
 export const findFile = (hash) => {
-  const fileCollection = db.find({ hash });
-  return fileCollection.location;
+  const file = db.get('files').find({ hash }).value();
+  return file;
 };
