@@ -1,11 +1,7 @@
 import crypto from 'crypto';
 import fs from 'fs';
-import jwt from 'jsonwebtoken';
 import util from 'util';
-
-const rename = util.promisify(fs.rename);
-const readFile = util.promisify(fs.readFile);
-const sign = util.promisify(jwt.sign);
+import { insertFile } from '../lib/db';
 
 export const getTemporaryFileName = str => crypto.createHash('md5').update(str).digest('hex');
 
@@ -17,35 +13,25 @@ export const storeFile = tmpFileName => new Promise((resolve, reject) => {
     hash.update(data);
   });
 
-  stream.on('end', async () => {
+  stream.on('end', () => {
     const fileHash = hash.digest('hex');
-    try {
-      const finalName = await getFinalFileName(fileHash);
-      console.log('finalname', finalName);
-      // fileSavePerm(...) ...
+    fs.rename(tmpFileName, fileHash, (err) => {
+      if (err) reject();
+      else resolve();
+    });
 
-    } catch (err) {
-      reject();
-    }
+    fileSavePerm(fileHash);
+
   });
 });
 
-const getFinalFileName = async (fileHash) => {
-  try {
-    const key = await readFile('keypair.pem');
-    const token = await sign(fileHash, key, { algorithm: 'RS256' });
-    return token;
-  } catch (err) {
-    throw err;
-  }
-};
 
-
-
-const fileSavePerm = (fs) => {
+const fileSavePerm = (fileHash) => {
   /**
    Send file to a cloud storage
    This upload should be done using a stream writer
    This upload show be done detached from the current thread
     * */
+
+  insertFile(fileHash, `./${fileHash}`);
 };
