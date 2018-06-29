@@ -29,7 +29,8 @@ export default class UploadForm extends Component {
       uploadRequest.attach(file.name, file);
       uploadRequest.end((err, res) => {
         if(err) {
-          console.log('error uploading file', file);
+          console.log('error response', err, res);
+          alert(res.body.error);
         } else {
           alert(`File upload completed!`);
           this.setState({'fileLink': `http://localhost:3000/api/files/${res.body.result}`});

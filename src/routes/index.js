@@ -22,7 +22,6 @@ router.post('/upload', async (req, res, next) => {
       file.on('end', () => {
         storeFile(tmpName).then((result) => {
           unLockOnFiles();
-          console.log(result);
           res.status(200).json({ result });
         });
       });
